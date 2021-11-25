@@ -22,8 +22,8 @@ public typealias HTTPHeaderFields = [String: String]
 /// - **baseURL** – a base URL that can be added to your request. Serves as an exception to the rule. In most cases the base URL will be taken from the Networking Provider.
 /// Specify this variable only when the base URL of a particular request differs from the base URL injected by Networking Provider.
 /// You can ignore this variable when creating an object. By default it returns nil.
-/// - **headerFields** – header fields that can be added to the request. The same as baseURL is a variable for exclusion.
-/// Only used when you want to specify additional header fields in addition to those specified in the CNPlugin array.
+/// - **headerFields** – header fields that can be added to the request.
+/// Used only if you want to specify additional header fields in addition to those specified in the CNPlugin array.
 /// You can ignore this variable when creating an object. By default it returns nil.
 /// - **multipartBody** – variable that can return CNMultipartFormDataModel. Used to create multipart form requests.
 /// If the variable does not return nil, the body created by the CNMultipartFormDataModel will be added to the request. Do not use this and body variable at the same time.
@@ -47,8 +47,8 @@ public protocol CNRequestBuilder {
     /// You can ignore this variable when creating an object. By default it returns nil.
     var baseURL: URL? { get }
     
-    /// Header fields that can be added to the request. The same as baseURL is a variable for exclusion.
-    /// Only used when you want to specify additional header fields in addition to those specified in the CNPlugin array.
+    /// Header fields that can be added to the request.
+    /// Used only if you want to specify additional header fields in addition to those specified in the CNPlugin array.
     /// You can ignore this variable when creating an object. By default it returns nil.
     var headerFields: HTTPHeaderFields? { get }
     

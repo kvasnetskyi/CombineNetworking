@@ -43,12 +43,13 @@ final public class CNProvider<RequestBuilder: CNRequestBuilder, ErrorHandler: CN
     public var decoder: JSONDecoder
     
     // MARK: - Init
-    public init(baseURL: URL,
-         reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
-         session: URLSession = .shared,
-         requestBuilder: RequestBuilder.Type,
-         plugins: [CNPlugin] = [],
-         decoder: JSONDecoder = JSONDecoder()
+    public init(
+        baseURL: URL,
+        reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+        session: URLSession = .shared,
+        requestBuilder: RequestBuilder.Type,
+        plugins: [CNPlugin] = [],
+        decoder: JSONDecoder = JSONDecoder()
     ) where ErrorHandler == CNErrorHandlerImpl {
         
         self.baseURL = baseURL
@@ -59,13 +60,15 @@ final public class CNProvider<RequestBuilder: CNRequestBuilder, ErrorHandler: CN
         self.decoder = decoder
     }
     
-    public required init(baseURL: URL,
-                  reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
-                  session: URLSession = .shared,
-                  errorHandler: ErrorHandler,
-                  requestBuilder: RequestBuilder.Type,
-                  plugins: [CNPlugin] = [],
-                  decoder: JSONDecoder = JSONDecoder()) {
+    public required init(
+        baseURL: URL,
+        reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+        session: URLSession = .shared,
+        errorHandler: ErrorHandler,
+        requestBuilder: RequestBuilder.Type,
+        plugins: [CNPlugin] = [],
+        decoder: JSONDecoder = JSONDecoder()
+    ) {
         
         self.baseURL = baseURL
         self.reachability = reachability

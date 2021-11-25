@@ -119,19 +119,13 @@ Data to be added to the body of the request. If the request should not contain a
 HTTP Method which will be added to the reques.
 
 * baseURL <br/>
-A base URL that can be added to your request. Serves as an exception to the rule. In most cases the base URL will be taken from the [CNProvider](#CNProvider).
-
-Specify this variable only when the base URL of a particular request differs from the base URL injected by Networking Provider. You can ignore this variable when creating an object. By default it returns nil.
+A base URL that can be added to your request. Serves as an exception to the rule. In most cases the base URL will be taken from the [CNProvider](#CNProvider). Specify this variable only when the base URL of a particular request differs from the base URL injected by Networking Provider. You can ignore this variable when creating an object. By default it returns nil.
 
 * headerFields <br/>
-Header fields that can be added to the request.
-
-Used only if you want to specify additional header fields in addition to those specified in the [CNPlugin](#CNPlugin) array. You can ignore this variable when creating an object. By default it returns nil.
+Header fields that can be added to the request. Used only if you want to specify additional header fields in addition to those specified in the [CNPlugin](#CNPlugin) array. You can ignore this variable when creating an object. By default it returns nil.
 
 * multipartBody <br/>
-Variable that can return CNMultipartFormDataModel. Used to create multipart form requests.
-
-If the variable does not return nil, the body created by the CNMultipartFormDataModel will be added to the request. Do not use this and body variable at the same time. You can ignore this variable when creating an object. By default it returns nil.
+Variable that can return CNMultipartFormDataModel. Used to create multipart form requests. If the variable does not return nil, the body created by the CNMultipartFormDataModel will be added to the request. Do not use this and body variable at the same time. You can ignore this variable when creating an object. By default it returns nil.
 
 # CNProvider
 A class that serves as a provider to run requests to the server.
@@ -218,29 +212,23 @@ public protocol CNProviderProtocol {
 
 Protocol contains associatedtypes:
 * RequestBuilder <br/>
-Type of object subscribed to the **CNRequestBuilder** protocol. Responsible for describing and creating the URLRequest object. [Described here](#CNRequestBuilder).
+Type of object subscribed to the [CNRequestBuilder](#CNRequestBuilder) protocol. Responsible for describing and creating the URLRequest object.
 
 * ErrorHandler <br/>
-The object type subscribed to the **CNErrorHandler** protocol. Responsible for handling errors received in CNProvider. [Described here](#CNErrorHandler).
+The object type subscribed to the [CNErrorHandler](#CNErrorHandler) protocol. Responsible for handling errors received in CNProvider.
 
 
 You will use the following methods to run the request to the server:
-* ```generalPerform```<br/>
-A method that starts a request task.
+* ```generalPerform(_:)```<br/>
+A method that starts a request task. Returns the publisher with the Data, or your custom error, which type is defined in CNErrorHandler.
 
-Returns the publisher with the Data, or your custom error, which type is defined in CNErrorHandler.
+* ```perform<T: Decodable>(_:)```<br/>
+A method that starts a request task and decodes the response into an object, relying on a generic parameter. Returns the publisher with the decoded object, or your custom error, which type is defined in CNErrorHandler.
 
-* ```perform<T: Decodable>```<br/>
-A method that starts a request task and decodes the response into an object, relying on a generic parameter.
+* ```perform<DecodableType: Decodable, Abstraction>(_:, decodableType:)```<br/>
+A method that starts a request task and decodes the response into an object, relying on a decodableType parameter. Returns the publisher with the generic abstraction object – protocol of the decoded object, or your custom error, which type is defined in CNErrorHandler.
 
-Returns the publisher with the decoded object, or your custom error, which type is defined in CNErrorHandler.
-
-* ```perform<DecodableType: Decodable, Abstraction>```<br/>
-A method that starts a request task and decodes the response into an object, relying on a decodableType parameter.
-
-Returns the publisher with the generic abstraction object – protocol of the decoded object, or your custom error, which type is defined in CNErrorHandler.
-
-* ```perform```<br/>
+* ```perform(_:)```<br/>
 A method that starts a request task. Returns the publisher, which can be completed successfully or with your custom error, which type is defined in CNErrorHandler.
 
 

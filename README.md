@@ -17,7 +17,7 @@ public protocol CNPlugin {
 }
 ```
 
-An object protocol that can modify a URLRequest. Most often you will use it to add certain headers.
+An object protocol that can modify a URLRequest. Most often you will use it to add certain headers:
 
 ```Ruby
 struct AuthPlugin: CNPlugin {
@@ -34,7 +34,7 @@ struct AuthPlugin: CNPlugin {
 ```
 
 # CNReachabilityManager
-### You can use the default implementation - CNReachabilityManagerImpl
+*You can use the default implementation - CNReachabilityManagerImpl*
 
 ```Ruby
 public protocol CNReachabilityManager: AnyObject {
@@ -47,7 +47,7 @@ Protocol object that monitors the internet connection before running the request
 You can write your own manager that will subscribe to this protocol, or use the default implementation - **CNReachabilityManagerImpl**.
 
 # CNErrorHandler
-### You can use the default implementation - CNErrorHandlerImpl
+*You can use the default implementation - CNErrorHandlerImpl*
 
 ```Ruby
 public protocol CNErrorHandler {
@@ -68,12 +68,15 @@ You can use the standard implementation of CNErrorHandler - **CNErrorHandlerImpl
 
 It contains:
 1. **ErrorType** *associatedtype*
+
 The error type that your Combine Networking will work with. You can use your own error type, but it must be signed to CNErrorProtocol, which contains the main errors.
 
 2. **outputHandling** *method*
+
 A method for processing the response from the server. Gets a server response that you can process the way you want, and a retryMethod block that can be used to retry the request after it has been processed. 
 
 3. **convert** *method*
+
 It often happens that a request to the network fails. For example, while launching the request, the Internet on the device has disappeared. 
 
 This method takes such errors as NSError, and serves to convert it into your custom error.

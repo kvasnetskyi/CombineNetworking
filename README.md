@@ -4,8 +4,8 @@
 It does not use any third-party dependencies, so there is nothing superfluous in it.
 
 1. [Components](#Components)
-2. [Example of usage](#Example of usage)
-3. [Multipart request](#Multipart request)
+2. [Example of usage](#Example-of-usage)
+3. [Multipart request](#Multipart-request)
 4. [Installation](#Installation)
 
 # Components
@@ -239,13 +239,13 @@ A method that starts a request task. Returns the publisher, which can be complet
 # Example of usage
 Follow these steps to set up your networking layer. Steps marked as optional can be skipped.
 
-1. [Creating CNPlugin implementations](#Creating CNPlugin implementations)
-2. [Creating a CNErrorProtocol implementation](#Creating a CNErrorProtocol implementation) – optional
-3. [Creating a CNErrorHandler implementation](#Creating a CNErrorHandler implementation) – optional
-4. [Creating a CNReachabilityManager implementation](#Creating a CNReachabilityManager implementation) – optional
-5. [Creating CNRequestBuilder implementations](#Creating CNRequestBuilder implementations)
-6. [Creating CNProvider implementations](#Creating CNProvider implementations)
-7. [Creating and using a network client](#Creating and using a network client)
+1. [Creating CNPlugin implementations](#Creating-CNPlugin-implementations)
+2. [Creating a CNErrorProtocol implementation](#Creating-a-CNErrorProtocol-implementation) – optional
+3. [Creating a CNErrorHandler implementation](#Creating-a-CNErrorHandler-implementation) – optional
+4. [Creating a CNReachabilityManager implementation](#Creating-a-CNReachabilityManager-implementation) – optional
+5. [Creating CNRequestBuilder implementations](#Creating-CNRequestBuilder-implementations)
+6. [Creating CNProvider implementations](#Creating-CNProvider-implementations)
+7. [Creating and using a network client](#Creating-and-using-a-network-client)
 
 # Creating CNPlugin implementations
 Create a [CNPlugin](#CNPlugin) object for every possible header that can be added to the request.

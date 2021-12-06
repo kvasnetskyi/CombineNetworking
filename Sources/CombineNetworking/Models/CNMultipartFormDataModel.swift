@@ -19,7 +19,7 @@ public struct CNMultipartFormDataModel {
     let boundary = UUID().uuidString
     
     // MARK: - Init
-    public init(with formItems: [CNMultipartFormItem]) {
+    public init(items formItems: [CNMultipartFormItem]) {
         self.formItems = formItems
     }
     
@@ -62,10 +62,19 @@ public struct CNMultipartFormItem {
     public var fileName: String
     
     /// File type. It is an optional variable.
-    public var mimeType: String? = nil
+    public var mimeType: String?
     
     /// Data to be added as part of the request body.
     public var data: Data
+    
+    // MARK: - Init
+    public init(name: String, fileName: String,
+                mimeType: String? = nil, data: Data) {
+        self.name = name
+        self.fileName = fileName
+        self.mimeType = mimeType
+        self.data = data
+    }
     
     // MARK: - Fileprivate Methods
     fileprivate func convert() -> Data {

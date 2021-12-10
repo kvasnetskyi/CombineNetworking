@@ -40,7 +40,7 @@ struct AuthPlugin: CNPlugin {
 ```
 
 # CNReachabilityManager
-###### You can use the default implementation - CNReachabilityManagerImpl
+###### You can use the default implementation - CNReachabilityManagerImpl. It is a singleton, which you can get by property shared.
 
 ```swift
 public protocol CNReachabilityManager: AnyObject {
@@ -142,7 +142,7 @@ CNProvider has several initializers. One of them uses the standard implementatio
 ```swift
 public init(
     baseURL: URL,
-    reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+    reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
     session: URLSession = .shared,
     requestBuilder: RequestBuilder.Type,
     plugins: [CNPlugin] = [],
@@ -151,7 +151,7 @@ public init(
 
 public required init(
     baseURL: URL,
-    reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+    reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
     session: URLSession = .shared,
     errorHandler: ErrorHandler,
     requestBuilder: RequestBuilder.Type,
@@ -361,7 +361,7 @@ struct CustomErrorHandlerTypeName: CNErrorHandler {
 
 Create your own implementation of the [CNReachabilityManager](#CNReachabilityManager) protocol **if the default CNReachabilityManagerImpl implementation is not suitable for you**. This object monitors the ability to connect to the network before launching a request to the server.
 
-*You can skip this step and use the standard implementation of CNReachabilityManager - CNReachabilityManagerImpl.*
+*You can skip this step and use the standard implementation of CNReachabilityManager - CNReachabilityManagerImpl. It is a singleton, which you can get by property shared.*
 
 ```swift
 class ReachabilityManager: CNReachabilityManager {
@@ -601,7 +601,7 @@ in `Package.swift` add the following:
 dependencies: [
     // Dependencies declare other packages that this package depends on.
     // .package(url: /* package url */, from: "1.0.0"),
-    .package(url: "https://github.com/kvasnetskyi/CombineNetworking.git", from: "1.0.2")
+    .package(url: "https://github.com/kvasnetskyi/CombineNetworking.git", from: "1.0.0")
 ],
 targets: [
     .target(

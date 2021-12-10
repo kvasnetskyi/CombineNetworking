@@ -9,7 +9,7 @@ import Foundation
 
 /// Manager to check the Internet connection. Used before attempting to send a request.
 ///
-/// You can use default implementation of the CNReachabilityManager – **CNReachabilityManagerImpl.**
+/// You can use default implementation of the CNReachabilityManager – **CNReachabilityManagerImpl.** It is a singleton, which you can get by property shared.
 public protocol CNReachabilityManager: AnyObject {
     var isInternetConnectionAvailable: Bool { get }
 }

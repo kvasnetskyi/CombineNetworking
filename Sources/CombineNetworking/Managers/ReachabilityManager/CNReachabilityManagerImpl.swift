@@ -9,7 +9,9 @@ import Foundation
 import Network
 
 /// Default implementation of the CNReachabilityManager.
+///
 /// It is manager to check the Internet connection. Used before attempting to send a request.
+/// It is a singleton, which you can get by property shared.
 public class CNReachabilityManagerImpl: CNReachabilityManager {
     // MARK: - Static Properties
     private static let queueLabel = "CNReachabilityManagerQueue"
@@ -22,8 +24,10 @@ public class CNReachabilityManagerImpl: CNReachabilityManager {
     // MARK: - Private Properties
     private var connectionMonitor = NWPathMonitor()
     
-    // MARK: - Init
-    public init() {
+    // MARK: - Singleton Init
+    public static let shared = CNReachabilityManagerImpl()
+    
+    private init() {
         let queue = DispatchQueue(
             label: CNReachabilityManagerImpl.queueLabel
         )

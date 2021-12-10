@@ -45,7 +45,7 @@ final public class CNProvider<RequestBuilder: CNRequestBuilder, ErrorHandler: CN
     // MARK: - Init
     public init(
         baseURL: URL,
-        reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+        reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
         session: URLSession = .shared,
         requestBuilder: RequestBuilder.Type,
         plugins: [CNPlugin] = [],
@@ -62,7 +62,7 @@ final public class CNProvider<RequestBuilder: CNRequestBuilder, ErrorHandler: CN
     
     public required init(
         baseURL: URL,
-        reachability: CNReachabilityManager = CNReachabilityManagerImpl(),
+        reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
         session: URLSession = .shared,
         errorHandler: ErrorHandler,
         requestBuilder: RequestBuilder.Type,
@@ -84,7 +84,8 @@ extension CNProvider {
     /// A method that starts a request task and decodes the response into an object, relying on a generic parameter.
     /// Returns the publisher with the decoded object, or ErrorHandler.ErrorType.
     public func perform<T: Decodable>(
-        _ builder: RequestBuilder) -> AnyPublisher<T, ErrorHandler.ErrorType> {
+        _ builder: RequestBuilder
+    ) -> AnyPublisher<T, ErrorHandler.ErrorType> {
             
             generalPerform(builder)
                 .decode(
@@ -109,7 +110,8 @@ extension CNProvider {
     /// Returns the publisher with the generic abstraction object – protocol of the decoded object, or ErrorHandler.ErrorType.
     public func perform<DecodableType: Decodable, Abstraction>(
         _ builder: RequestBuilder,
-        decodableType: DecodableType.Type) -> AnyPublisher<Abstraction, ErrorHandler.ErrorType> {
+        decodableType: DecodableType.Type
+    ) -> AnyPublisher<Abstraction, ErrorHandler.ErrorType> {
             
             generalPerform(builder)
                 .decode(

@@ -11,7 +11,7 @@ enum CNFatalError: Error {
     case pathIncorrect(_ path: String)
     case pathOrQueryIncorrect(_ path: String, _ query: QueryItems)
     
-    var localizedDescription: String {
+    var description: String {
         switch self {
         case .pathIncorrect(let path):
             return "Path is incorrect: \(path)"

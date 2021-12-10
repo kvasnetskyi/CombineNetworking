@@ -59,7 +59,7 @@ public protocol CNRequestBuilder {
     var multipartBody: CNMultipartFormDataModel? { get }
 }
 
-// MARK: - Public Methods
+// MARK: - Protocol Extension
 extension CNRequestBuilder {
     public var baseURL: URL? { nil }
     public var headerFields: HTTPHeaderFields? { nil }
@@ -70,7 +70,7 @@ extension CNRequestBuilder {
     /// When creating a URLRequest, the method checks if the CNRequestBuilder has baseURL and headerFields, and if not, takes them from the parameters.
     /// Also, the method checks if the CNRequestBuilder has a multipartBody variable.
     /// If it is, it substitutes it in the body of the request, if not, it substitutes the body variable in the body.
-    public func makeRequest(baseURL: URL, plugins: [CNPlugin]) -> URLRequest {
+    func makeRequest(baseURL: URL, plugins: [CNPlugin]) -> URLRequest {
         var request = makeRequestWithoutBody(baseURL: baseURL, plugins: plugins)
         
         guard let multipartBody = multipartBody,
@@ -141,7 +141,7 @@ private extension CNRequestBuilder {
             fatalError(
                 CNFatalError
                     .pathIncorrect(path)
-                    .localizedDescription
+                    .description
             )
         }
         
@@ -151,7 +151,7 @@ private extension CNRequestBuilder {
             fatalError(
                 CNFatalError
                     .pathOrQueryIncorrect(path, query)
-                    .localizedDescription
+                    .description
             )
         }
                              

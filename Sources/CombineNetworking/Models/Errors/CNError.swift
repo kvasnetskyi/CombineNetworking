@@ -20,7 +20,7 @@ public enum CNError: CNErrorProtocol {
     case serverError
     case unspecifiedError
     
-    var localizedDescription: String? {
+    var description: String? {
         switch self {
         case .badURLError:
             return "Bad URL Error. Please try again later."

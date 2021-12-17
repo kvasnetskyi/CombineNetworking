@@ -71,13 +71,15 @@ extension CNRequestBuilder {
     /// Also, the method checks if the CNRequestBuilder has a multipartBody variable.
     /// If it is, it substitutes it in the body of the request, if not, it substitutes the body variable in the body.
     func makeRequest(baseURL: URL, plugins: [CNPlugin]) -> URLRequest {
-        var request = makeRequestWithoutBody(baseURL: baseURL, plugins: plugins)
+        var request = makeRequestWithoutBody(baseURL: baseURL)
         
         guard let multipartBody = multipartBody,
               method != .get else {
                   
             request.httpBody = body
+            plugins.forEach { $0.modifyRequest(&request) }
             CNLogManager.log(request)
+            
             return request
         }
         
@@ -91,6 +93,7 @@ extension CNRequestBuilder {
         )
         
         request.httpBody = body
+        plugins.forEach { $0.modifyRequest(&request) }
         CNLogManager.log(request)
         
         return request
@@ -99,14 +102,12 @@ extension CNRequestBuilder {
 
 // MARK: - Private Methods
 private extension CNRequestBuilder {
-    func makeRequestWithoutBody(baseURL: URL, plugins: [CNPlugin]) -> URLRequest {
+    func makeRequestWithoutBody(baseURL: URL) -> URLRequest {
         let baseURL = self.baseURL ?? baseURL
         let url = getURL(baseURL: baseURL)
         
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
-        
-        plugins.forEach { $0.modifyRequest(&request) }
         
         headerFields?.forEach {
             request.addValue(

@@ -30,7 +30,7 @@ public protocol CNErrorHandler {
     /// retryMethod can be used to retry a request after an error has been handled.
     func outputHandling(
         _ output: NetworingOutput,
-        _ retryMethod: @autoclosure () -> AnyPublisher<Data, ErrorType>
+        _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, ErrorType>
     ) -> AnyPublisher<Data, ErrorType>
     
     /// Method for converting NSError on unsuccessful request  to ErrorType.

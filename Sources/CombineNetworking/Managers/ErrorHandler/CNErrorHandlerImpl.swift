@@ -21,7 +21,7 @@ public struct CNErrorHandlerImpl: CNErrorHandler {
     /// retryMethod can be used to retry a request after an error has been handled.
     public func outputHandling(
         _ output: NetworingOutput,
-        _ retryMethod: @autoclosure () -> AnyPublisher<Data, CNError>) -> AnyPublisher<Data, CNError> {
+        _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, CNError>) -> AnyPublisher<Data, CNError> {
             
         guard let httpResponse = output.response as? HTTPURLResponse else {
             return Fail(error: CNError.unspecifiedError)

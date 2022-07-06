@@ -66,32 +66,6 @@ final public class CNProvider<RequestBuilder: CNRequestBuilder, OutputHandler: C
         )
     }
     
-    public convenience init<AuthOutputHandler: CNAuthOutputHandler>(
-        baseURL: URL,
-        reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
-        session: URLSession = .shared,
-        authOutputHandler: AuthOutputHandler,
-        errorConverter: ErrorConverter,
-        requestBuilder: RequestBuilder.Type,
-        plugins: [CNPlugin] = [],
-        decoder: JSONDecoder = JSONDecoder()
-    ) where AuthOutputHandler.ErrorType == ErrorConverter.ErrorType,
-            OutputHandler == CNAuthOutputHandlerAdapter<AuthOutputHandler> {
-        
-        let handler = CNAuthOutputHandlerAdapter(authOutputHandler)
-        
-        self.init(
-            baseURL: baseURL,
-            reachability: reachability,
-            session: session,
-            outputHandler: handler,
-            errorConverter: errorConverter,
-            requestBuilder: requestBuilder,
-            plugins: plugins,
-            decoder: decoder
-        )
-    }
-    
     public required init(
         baseURL: URL,
         reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,

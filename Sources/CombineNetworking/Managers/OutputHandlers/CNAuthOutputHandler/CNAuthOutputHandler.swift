@@ -19,8 +19,8 @@ public protocol CNAuthOutputHandler {
     associatedtype TokenResponseService: CNTokenResponseService
     where TokenResponseService.ErrorType == ErrorType
     
-    var tokenRequestService: TokenRequestService { get }
-    var tokenResponseService: TokenResponseService { get }
+    var tokenRequestService: TokenRequestService? { get }
+    var tokenResponseService: TokenResponseService? { get }
     
     func handleNonUnauthorizedResponse(
         _ output: NetworingOutput,

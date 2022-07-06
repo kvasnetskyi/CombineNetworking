@@ -24,19 +24,21 @@ extension CNAuthOutputHandlerAdapter: CNOutputHandler {
         _ output: NetworingOutput,
         _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, Handler.ErrorType>
     ) -> AnyPublisher<Data, Handler.ErrorType> {
-        guard let httpResponse = output.response as? HTTPURLResponse,
+        guard let tokenResponseService = handler.tokenResponseService,
+              let tokenRequestService = handler.tokenRequestService,
+              let httpResponse = output.response as? HTTPURLResponse,
               httpResponse.statusCode == 401 else {
                   return handler.handleNonUnauthorizedResponse(
                     output, retryMethod()
                   )
               }
         
-        return handler.tokenResponseService.getTokenRequestModel()
+        return tokenResponseService.getTokenRequestModel()
             .flatMap { model -> AnyPublisher<CNTokenResponseModel, ErrorType> in
-                handler.tokenRequestService.requestToken(model)
+                tokenRequestService.requestToken(model)
             }
             .flatMap { model -> AnyPublisher<Void, ErrorType> in
-                handler.tokenResponseService.handle(token: model)
+                tokenResponseService.handle(token: model)
             }
             .flatMap {
                 retryMethod()

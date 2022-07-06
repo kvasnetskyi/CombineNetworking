@@ -8,9 +8,7 @@
 import Combine
 
 public protocol CNTokenRequestService {
-    associatedtype RefreshTokenModel
-    associatedtype Output
-    associatedtype ErrorType: CNErrorProtocol
+    associatedtype ErrorType: Error
     
-    func refreshToken(_ model: RefreshTokenModel) -> AnyPublisher<Output, ErrorType>
+    func requestToken(_ model: CNTokenRequestModel) -> AnyPublisher<CNTokenResponseModel, ErrorType>
 }

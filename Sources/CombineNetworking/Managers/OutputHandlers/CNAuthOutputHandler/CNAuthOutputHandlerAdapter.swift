@@ -31,12 +31,12 @@ extension CNAuthOutputHandlerAdapter: CNOutputHandler {
                   )
               }
         
-        return handler.tokenResponseService.getRefreshTokenModel()
-            .flatMap { model -> AnyPublisher<Handler.TokenResponseService.Input, ErrorType> in
-                handler.tokenRequestService.refreshToken(model)
+        return handler.tokenResponseService.getTokenRequestModel()
+            .flatMap { model -> AnyPublisher<CNTokenResponseModel, ErrorType> in
+                handler.tokenRequestService.requestToken(model)
             }
-            .flatMap { tokenModel -> AnyPublisher<Void, ErrorType> in
-                handler.tokenResponseService.handle(tokenModel)
+            .flatMap { model -> AnyPublisher<Void, ErrorType> in
+                handler.tokenResponseService.handle(token: model)
             }
             .flatMap {
                 retryMethod()

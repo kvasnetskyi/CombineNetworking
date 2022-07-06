@@ -17,9 +17,7 @@ public protocol CNAuthOutputHandler {
     where TokenRequestService.ErrorType == ErrorType
     
     associatedtype TokenResponseService: CNTokenResponseService
-    where TokenResponseService.Input == TokenRequestService.Output,
-          TokenResponseService.ErrorType == ErrorType,
-          TokenResponseService.RefreshTokenModel == TokenRequestService.RefreshTokenModel
+    where TokenResponseService.ErrorType == ErrorType
     
     var tokenRequestService: TokenRequestService { get }
     var tokenResponseService: TokenResponseService { get }

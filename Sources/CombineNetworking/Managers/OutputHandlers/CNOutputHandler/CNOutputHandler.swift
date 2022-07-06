@@ -1,5 +1,5 @@
 //
-//  CNErrorHandler.swift
+//  CNOutputHandler.swift
 //  CombineNetworking
 //
 //  Created by Artem Kvasnetskyi on 23.10.2021.
@@ -19,9 +19,9 @@ public typealias NetworingOutput = (data: Data, response: URLResponse)
 /// - **outputHandling method** – to handle the response from the server.
 /// - **convert method** – to convert NSError on unsuccessful request  to ErrorType.
 ///
-/// You can use the default implementation of the CNErrorHandler – **CNErrorHandlerImpl**
+/// You can use the default implementation of the CNOutputHandler – **CNOutputHandlerImpl**
 ///
-public protocol CNErrorHandler {
+public protocol CNOutputHandler {
     /// The type of error the manager will work with.
     /// You can use your own error type, but it must be subscribed to CNErrorProtocol.
     associatedtype ErrorType: CNErrorProtocol
@@ -32,7 +32,4 @@ public protocol CNErrorHandler {
         _ output: NetworingOutput,
         _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, ErrorType>
     ) -> AnyPublisher<Data, ErrorType>
-    
-    /// Method for converting NSError on unsuccessful request  to ErrorType.
-    func convert(error: NSError) -> ErrorType
 }

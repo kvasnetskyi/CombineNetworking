@@ -1,5 +1,5 @@
 //
-//  CNErrorHandlerImpl.swift
+//  CNOutputHandlerImpl.swift
 //  CombineNetworking
 //
 //  Created by Artem Kvasnetskyi on 23.10.2021.
@@ -8,15 +8,14 @@
 import Foundation
 import Combine
 
-/// Default implementation of the CNErrorHandler.
+/// Default implementation of the CNOutputHandler.
 /// It is manager for handling CNProvider errors.
 ///
 /// It contains:
 /// - **outputHandling method** – to handle the response from the server.
 /// - **convert method** – to convert NSError on unsuccessful request  to ErrorType.
 ///
-public struct CNErrorHandlerImpl: CNErrorHandler {
-    
+public struct CNOutputHandlerImpl: CNOutputHandler {
     /// A method for processing the response from the server. Receives server response and the retryMethod block.
     /// retryMethod can be used to retry a request after an error has been handled.
     public func outputHandling(
@@ -45,32 +44,6 @@ public struct CNErrorHandlerImpl: CNErrorHandler {
         default:
             return Fail(error: CNError.unspecifiedError)
                 .eraseToAnyPublisher()
-        }
-    }
-    
-    /// Method for converting NSError on unsuccessful request  to ErrorType.
-    public func convert(error: NSError) -> CNError {
-        switch error.code {
-        case NSURLErrorBadURL:
-            return .badURLError
-            
-        case NSURLErrorTimedOut:
-            return .timedOutError
-            
-        case NSURLErrorCannotFindHost, NSURLErrorCannotConnectToHost:
-            return .hostError
-            
-        case NSURLErrorHTTPTooManyRedirects:
-            return .tooManyRedirectsError
-            
-        case NSURLErrorResourceUnavailable:
-            return .resourceUnavailable
-            
-        case NSURLErrorNotConnectedToInternet, NSURLErrorCallIsActive,
-            NSURLErrorNetworkConnectionLost, NSURLErrorDataNotAllowed:
-            return .reachabilityError
-            
-        default: return .unspecifiedError
         }
     }
 }

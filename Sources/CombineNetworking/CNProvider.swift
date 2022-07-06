@@ -14,66 +14,99 @@ import Foundation
 /// Contains associatedtypes:
 /// - **RequestBuilder** - type of object subscribed to the **CNRequestBuilder** protocol.
 /// Responsible for describing and creating the URLRequest object.
-/// - **ErrorHandler** - the object type subscribed to the **CNErrorHandler** protocol.
+/// - **OutputHandler** - the object type subscribed to the **CNOutputHandler** protocol.
 /// Responsible for handling errors received in CNProvider.
-/// If necessary, you can use a ready-made implementation - CNErrorHandlerImpl, or create your own.
+/// If necessary, you can use a ready-made implementation - CNOutputHandlerImpl, or create your own.
 ///
 
-final public class CNProvider<RequestBuilder: CNRequestBuilder, ErrorHandler: CNErrorHandler>: CNProviderProtocol {
+final public class CNProvider<RequestBuilder: CNRequestBuilder, OutputHandler: CNOutputHandler, ErrorConverter: CNErrorConverter>: CNProviderProtocol where OutputHandler.ErrorType == ErrorConverter.ErrorType {
     // MARK: - Public Properties
     /// Base URL where the request will be made.
-    public var baseURL: URL
+    public private(set) var baseURL: URL
     
     /// Manager to check the Internet connection.
     /// Used before attempting to send a request.
-    public var reachability: CNReachabilityManager
+    public private(set) var reachability: CNReachabilityManager
     
     /// URLSession with which the request will be executed
-    public var session: URLSession
+    public private(set) var session: URLSession
     
     /// Responsible for handling errors received in CNProvider.
-    public var errorHandler: ErrorHandler
+    public private(set) var outputHandler: OutputHandler
+    
+    public private(set) var errorConverter: ErrorConverter
     
     /// Array with objects for request modification.
     ///
     /// Most often you will use it to customize request headers.
-    public var plugins: [CNPlugin]
+    public private(set) var plugins: [CNPlugin]
     
     /// JSONDecoder with which the object will be decoded.
-    public var decoder: JSONDecoder
+    public private(set) var decoder: JSONDecoder
     
     // MARK: - Init
-    public init(
+    public convenience init(
         baseURL: URL,
         reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
         session: URLSession = .shared,
+        errorConverter: ErrorConverter,
         requestBuilder: RequestBuilder.Type,
         plugins: [CNPlugin] = [],
         decoder: JSONDecoder = JSONDecoder()
-    ) where ErrorHandler == CNErrorHandlerImpl {
+    ) where OutputHandler == CNOutputHandlerImpl {
+        self.init(
+            baseURL: baseURL,
+            reachability: reachability,
+            session: session,
+            outputHandler: CNOutputHandlerImpl(),
+            errorConverter: errorConverter,
+            requestBuilder: requestBuilder,
+            plugins: plugins,
+            decoder: decoder
+        )
+    }
+    
+    public convenience init<AuthOutputHandler: CNAuthOutputHandler>(
+        baseURL: URL,
+        reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
+        session: URLSession = .shared,
+        authOutputHandler: AuthOutputHandler,
+        errorConverter: ErrorConverter,
+        requestBuilder: RequestBuilder.Type,
+        plugins: [CNPlugin] = [],
+        decoder: JSONDecoder = JSONDecoder()
+    ) where AuthOutputHandler.ErrorType == ErrorConverter.ErrorType,
+            OutputHandler == CNAuthOutputHandlerAdapter<AuthOutputHandler> {
         
-        self.baseURL = baseURL
-        self.reachability = reachability
-        self.session = session
-        self.errorHandler = CNErrorHandlerImpl()
-        self.plugins = plugins
-        self.decoder = decoder
+        let handler = CNAuthOutputHandlerAdapter(authOutputHandler)
+        
+        self.init(
+            baseURL: baseURL,
+            reachability: reachability,
+            session: session,
+            outputHandler: handler,
+            errorConverter: errorConverter,
+            requestBuilder: requestBuilder,
+            plugins: plugins,
+            decoder: decoder
+        )
     }
     
     public required init(
         baseURL: URL,
         reachability: CNReachabilityManager = CNReachabilityManagerImpl.shared,
         session: URLSession = .shared,
-        errorHandler: ErrorHandler,
+        outputHandler: OutputHandler,
+        errorConverter: ErrorConverter,
         requestBuilder: RequestBuilder.Type,
         plugins: [CNPlugin] = [],
         decoder: JSONDecoder = JSONDecoder()
     ) {
-        
         self.baseURL = baseURL
         self.reachability = reachability
         self.session = session
-        self.errorHandler = errorHandler
+        self.outputHandler = outputHandler
+        self.errorConverter = errorConverter
         self.plugins = plugins
         self.decoder = decoder
     }
@@ -85,23 +118,23 @@ extension CNProvider {
     /// Returns the publisher with the decoded object, or ErrorHandler.ErrorType.
     public func perform<T: Decodable>(
         _ builder: RequestBuilder
-    ) -> AnyPublisher<T, ErrorHandler.ErrorType> {
+    ) -> AnyPublisher<T, OutputHandler.ErrorType> {
             
             generalPerform(builder)
                 .decode(
                     type: T.self,
                     decoder: decoder
                 )
-                .mapError { error -> ErrorHandler.ErrorType in
+                .mapError { error -> OutputHandler.ErrorType in
                     guard let _ = error as? DecodingError else {
-                        guard let error = error as? ErrorHandler.ErrorType else {
+                        guard let error = error as? OutputHandler.ErrorType else {
                             return .unspecifiedError
                         }
                         
                         return error
                     }
                     
-                    return ErrorHandler.ErrorType.decodingError
+                    return OutputHandler.ErrorType.decodingError
                 }
                 .eraseToAnyPublisher()
     }
@@ -111,30 +144,30 @@ extension CNProvider {
     public func perform<DecodableType: Decodable, Abstraction>(
         _ builder: RequestBuilder,
         decodableType: DecodableType.Type
-    ) -> AnyPublisher<Abstraction, ErrorHandler.ErrorType> {
+    ) -> AnyPublisher<Abstraction, OutputHandler.ErrorType> {
             
             generalPerform(builder)
                 .decode(
                     type: DecodableType.self,
                     decoder: decoder
                 )
-                .mapError { error -> ErrorHandler.ErrorType in
+                .mapError { error -> OutputHandler.ErrorType in
                     guard let _ = error as? DecodingError else {
-                        guard let error = error as? ErrorHandler.ErrorType else {
+                        guard let error = error as? OutputHandler.ErrorType else {
                             return .unspecifiedError
                         }
                         
                         return error
                     }
                     
-                    return ErrorHandler.ErrorType.decodingError
+                    return OutputHandler.ErrorType.decodingError
                 }
                 .compactMap { $0 as? Abstraction }
                 .eraseToAnyPublisher()
     }
     
     /// A method that starts a request task. Returns the publisher, which can be completed successfully or with ErrorHandler.ErrorType.
-    public func perform(_ builder: RequestBuilder) -> AnyPublisher<Never, ErrorHandler.ErrorType> {
+    public func perform(_ builder: RequestBuilder) -> AnyPublisher<Never, OutputHandler.ErrorType> {
         generalPerform(builder)
             .ignoreOutput()
             .eraseToAnyPublisher()
@@ -142,23 +175,23 @@ extension CNProvider {
     
     /// A method that starts a request task.
     /// Returns the publisher with the Data, or ErrorHandler.ErrorType.
-    public func generalPerform(_ builder: RequestBuilder) -> AnyPublisher<Data, ErrorHandler.ErrorType> {
+    public func generalPerform(_ builder: RequestBuilder) -> AnyPublisher<Data, OutputHandler.ErrorType> {
             guard reachability.isInternetConnectionAvailable else {
-                return Fail(error: ErrorHandler.ErrorType.reachabilityError)
+                return Fail(error: OutputHandler.ErrorType.reachabilityError)
                     .eraseToAnyPublisher()
             }
             
             let request = builder.makeRequest(baseURL: baseURL, plugins: plugins)
             
             return session.dataTaskPublisher(for: request)
-                .mapError { [weak self] error -> ErrorHandler.ErrorType in
+                .mapError { [weak self] error -> OutputHandler.ErrorType in
                     guard let self = self else {
                         return .unspecifiedError
                     }
                     
-                    return self.errorHandler.convert(error: error as NSError)
+                    return self.errorConverter.convert(error: error as NSError)
                 }
-                .flatMap { [weak self] output -> AnyPublisher<Data, ErrorHandler.ErrorType> in
+                .flatMap { [weak self] output -> AnyPublisher<Data, OutputHandler.ErrorType> in
                     guard let self = self else {
                         return Fail(error: .unspecifiedError)
                             .eraseToAnyPublisher()
@@ -166,7 +199,7 @@ extension CNProvider {
                     
                     CNLogManager.log(output)
                     
-                    return self.errorHandler.outputHandling(
+                    return self.outputHandler.outputHandling(
                         output,
                         self.generalPerform(builder)
                     )

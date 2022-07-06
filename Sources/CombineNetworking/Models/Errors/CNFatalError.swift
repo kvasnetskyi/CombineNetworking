@@ -11,6 +11,8 @@ enum CNFatalError: Error {
     case pathIncorrect(_ path: String)
     case pathOrQueryIncorrect(_ path: String, _ query: QueryItems)
     
+    case dammyObjectUsed
+    
     var description: String {
         switch self {
         case .pathIncorrect(let path):
@@ -18,6 +20,9 @@ enum CNFatalError: Error {
             
         case .pathOrQueryIncorrect(let path, let query):
             return "URL with path: \(path) and query items:\n\(query)\nis incorrect"
+            
+        case .dammyObjectUsed:
+            return "You are using a dammy object."
         }
     }
 }

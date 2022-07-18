@@ -112,25 +112,9 @@ extension CNProvider {
         _ builder: RequestBuilder,
         decodableType: DecodableType.Type
     ) -> AnyPublisher<Abstraction, ErrorHandler.ErrorType> {
-            
-            generalPerform(builder)
-                .decode(
-                    type: DecodableType.self,
-                    decoder: decoder
-                )
-                .mapError { error -> ErrorHandler.ErrorType in
-                    guard let _ = error as? DecodingError else {
-                        guard let error = error as? ErrorHandler.ErrorType else {
-                            return .unspecifiedError
-                        }
-                        
-                        return error
-                    }
-                    
-                    return ErrorHandler.ErrorType.decodingError
-                }
-                .compactMap { $0 as? Abstraction }
-                .eraseToAnyPublisher()
+        (perform(builder) as AnyPublisher<DecodableType, ErrorHandler.ErrorType>)
+            .compactMap { $0 as? Abstraction }
+            .eraseToAnyPublisher()
     }
     
     /// A method that starts a request task. Returns the publisher, which can be completed successfully or with ErrorHandler.ErrorType.

@@ -16,6 +16,10 @@ let package = Package(
         .target(
             name: "CombineNetworking",
             dependencies: []
+        ),
+        .testTarget(
+            name: "CombineNetworkingTests",
+            dependencies: ["CombineNetworking"]
         )
     ]
 )

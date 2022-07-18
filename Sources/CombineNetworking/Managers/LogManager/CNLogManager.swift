@@ -8,10 +8,14 @@
 import Foundation
 
 struct CNLogManager {
+    static var isLogsTurnedOn = true
+    
     private static let newLine = "\n"
     private static let divider = "---------------------------"
     
     static func log(_ request: URLRequest) {
+        guard isLogsTurnedOn else { return }
+        
         let method = "--method " + "\(request.httpMethod ?? HTTPMethod.get.rawValue) \(newLine)"
         let url: String = "--url " + "\'\(request.url?.absoluteString ?? "")\' \(newLine)"
         
@@ -41,6 +45,8 @@ struct CNLogManager {
     }
     
     static func log(_ output: NetworingOutput) {
+        guard isLogsTurnedOn else { return }
+        
         let url: String = "--url " + "\'\(output.response.url?.absoluteString ?? "")\' \(newLine)"
         
         var toPrint = newLine + "RESPONSE" + newLine + divider + newLine

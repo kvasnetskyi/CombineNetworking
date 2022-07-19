@@ -22,10 +22,11 @@ class CNRequestBuilderTests: XCTestCase {
     }
 
     override func tearDown() {
-        super.tearDown()
         builder = nil
         sut = nil
         plugin = nil
+        
+        super.tearDown()
     }
 }
 
@@ -155,6 +156,12 @@ extension CNRequestBuilderTests {
 
 // MARK: - Private Methods
 private extension CNRequestBuilderTests {
+    func getDataForTest(
+        _ method: StaticString = #function
+    ) -> Data {
+        method.description.data(using: .utf8)!
+    }
+    
     func getMethod(
         from request: URLRequest,
         file: StaticString = #file,

@@ -15,9 +15,7 @@ final class CNProviderBuilder {
     private(set) var errorHandler: CNErrorHandlerMock = TestDoublesFactory.Mock.getCNErrorHandler()
     private(set) var plugins: [CNPlugin] = []
     private(set) var decoder: JSONDecoder = .init()
-    private(set) var session: URLSession = TestDoublesFactory.Stub.getURLSession(
-        response: .init(), statusCode: 200
-    )
+    private(set) var session: URLSession!
     
     private(set) var reachability: CNReachabilityManager = TestDoublesFactory.Stub.getReachabilityManager(
         isInternetConnectionAvailable: true
@@ -72,17 +70,39 @@ extension CNProviderBuilder {
         
         return self
     }
+    
+    func makeRecursiveErrorInRequest(numberOfRecursiveCalls: Int) -> Self {
+        errorHandler = TestDoublesFactory.Mock.getCNErrorHandler(
+            numberOfCyclesThatRetryMethodMustBeCalled: numberOfRecursiveCalls
+        )
+        
+        return self
+    }
+    
+    func makeResponse(_ result: Result<Data, NSError>) -> Self {
+        session = TestDoublesFactory.Stub.getURLSession(response: result)
+        
+        return self
+    }
 }
 
 // MARK: -
 extension CNProviderBuilder {
-    func build() -> CNProvider<CNRequestBuilderMock, CNErrorHandlerMock> {
-        .init(
+    func build() -> CNProvider<CNRequestBuilderFake, CNErrorHandlerMock> {
+        if session == nil {
+            let data = try! JSONEncoder().encode("CNProviderBuilder")
+            
+            session = TestDoublesFactory.Stub.getURLSession(
+                response: .success(data)
+            )
+        }
+        
+        return .init(
             baseURL: baseURL,
             reachability: reachability,
             session: session,
             errorHandler: errorHandler,
-            requestBuilder: CNRequestBuilderMock.self,
+            requestBuilder: CNRequestBuilderFake.self,
             plugins: plugins,
             decoder: decoder
         )

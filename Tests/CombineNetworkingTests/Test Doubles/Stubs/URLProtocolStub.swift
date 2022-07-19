@@ -8,8 +8,7 @@
 import Foundation
 
 final class URLProtocolStub: URLProtocol {
-    static var response: Data = .init()
-    static var statusCode: Int = 200
+    static var response: Result<Data, NSError>?
     
     override class func canInit(
         with request: URLRequest
@@ -20,25 +19,33 @@ final class URLProtocolStub: URLProtocol {
     ) -> URLRequest { request }
 
     override func startLoading() {
-        guard let url = request.url else {
+        guard let url = request.url,
+              let result = URLProtocolStub.response else {
+            
             self.client?.urlProtocolDidFinishLoading(self)
             return
         }
         
-        let response = HTTPURLResponse(
-            url: url,
-            statusCode: URLProtocolStub.statusCode,
-            httpVersion: "HTTP/1.1",
-            headerFields: nil
-        )
-        
-        self.client?.urlProtocol(
-            self, didReceive: response!,
-            cacheStoragePolicy: .notAllowed
-        )
-        
-        self.client?.urlProtocol(self, didLoad: URLProtocolStub.response)
-        self.client?.urlProtocolDidFinishLoading(self)
+        switch result {
+        case .success(let data):
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: "HTTP/1.1",
+                headerFields: nil
+            )
+            
+            self.client?.urlProtocol(
+                self, didReceive: response!,
+                cacheStoragePolicy: .notAllowed
+            )
+            
+            self.client?.urlProtocol(self, didLoad: data)
+            self.client?.urlProtocolDidFinishLoading(self)
+            
+        case .failure(let error):
+            self.client?.urlProtocol(self, didFailWithError: error)
+        }
     }
 
     override func stopLoading() {}

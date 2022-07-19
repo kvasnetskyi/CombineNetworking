@@ -10,6 +10,7 @@ import Foundation
 enum CNFatalError: Error {
     case pathIncorrect(_ path: String)
     case pathOrQueryIncorrect(_ path: String, _ query: QueryItems)
+    case custom(_ description: String)
     
     var description: String {
         switch self {
@@ -18,6 +19,9 @@ enum CNFatalError: Error {
             
         case .pathOrQueryIncorrect(let path, let query):
             return "URL with path: \(path) and query items:\n\(query)\nis incorrect"
+            
+        case .custom(let description):
+            return description
         }
     }
 }

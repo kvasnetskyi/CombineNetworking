@@ -14,6 +14,7 @@ final class CNErrorHandlerMock: CNErrorHandler {
     // MARK: - Internal Properties
     private(set) var countOfOutputHandlingMethodsCalled: Int = .zero
     private(set) var countOfConvertMethodsCalled: Int = .zero
+    private(set) var lastOutputHandlingMethodOutputParameter: NetworingOutput?
     
     // MARK: - Private Properties
     private var numberOfCyclesThatRetryMethodMustBeCalled: Int
@@ -34,9 +35,10 @@ final class CNErrorHandlerMock: CNErrorHandler {
         _ output: NetworingOutput,
         _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, CNError>
     ) -> AnyPublisher<Data, CNError> {
+        lastOutputHandlingMethodOutputParameter = output
         countOfOutputHandlingMethodsCalled += 1
         
-        guard numberOfCyclesThatRetryMethodMustBeCalled == .zero else {
+        guard numberOfCyclesThatRetryMethodMustBeCalled <= 1 else {
             numberOfCyclesThatRetryMethodMustBeCalled -= 1
             return retryMethod()
         }

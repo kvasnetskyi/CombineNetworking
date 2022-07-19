@@ -12,11 +12,10 @@ import Foundation
 struct TestDoublesFactory {
     // MARK: - Stubs
     struct Stub {
-        static func getURLSession(response: Data, statusCode: Int) -> URLSession {
+        static func getURLSession(response: Result<Data, NSError>) -> URLSession {
             let config = URLSessionConfiguration.ephemeral
             config.protocolClasses = [URLProtocolStub.self]
             URLProtocolStub.response = response
-            URLProtocolStub.statusCode = statusCode
             
             return URLSession(configuration: config)
         }
@@ -44,14 +43,6 @@ struct TestDoublesFactory {
             )
         }
         
-        static func getCNRequestBuilder() -> CNRequestBuilderMock {
-            .init(
-                urlForRequest: URL(
-                    string: "https://CNRequestBuilderMock.test/testURL"
-                )!
-            )
-        }
-        
         static func getJSONDecoder(isErrorResult: Bool = false) -> JSONDecoderMock {
             .init(isErrorResult: isErrorResult)
         }
@@ -70,6 +61,13 @@ struct TestDoublesFactory {
                 method: method,
                 headerFields: headerFields
             )
+        }
+        
+        static func getCNRequestBuilder(isNeedToAddBaseURL: Bool) -> CNRequestBuilderFake {
+            guard isNeedToAddBaseURL else { return .init() }
+            
+            let url = URL(string: "https://CNRequestBuilderMock.test/testURL/")!
+            return .init(baseURL: url)
         }
     }
 }

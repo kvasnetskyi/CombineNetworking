@@ -8,6 +8,8 @@
 import XCTest
 import Combine
 
+@testable import CombineNetworking
+
 extension XCTestCase {
     func awaitPublisher<T: Publisher>(
         _ publisher: T,
@@ -22,7 +24,7 @@ extension XCTestCase {
             timeout: timeout,
             file: file,
             line: line
-        )
+        ).get()
     }
     
     func awaitPublisher<T: Publisher>(
@@ -38,7 +40,7 @@ extension XCTestCase {
             timeout: timeout,
             file: file,
             line: line
-        )
+        ).get()
     }
     
     func awaitPublisher<T: Publisher>(
@@ -52,7 +54,53 @@ extension XCTestCase {
             timeout: timeout,
             file: file,
             line: line
-        )
+        ).get()
+    }
+    
+    func awaitErrorPublisher<T: Publisher>(
+        _ publisher: T,
+        withAct action: @autoclosure () -> Void,
+        timeout: TimeInterval = 2,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) throws -> T.Failure {
+        try awaitPublisher(
+            publisher: publisher,
+            act: action,
+            timeout: timeout,
+            file: file,
+            line: line
+        ).getError()
+    }
+    
+    func awaitErrorPublisher<T: Publisher>(
+        _ publisher: T,
+        withAct action: () -> Void,
+        timeout: TimeInterval = 2,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) throws -> T.Failure {
+        try awaitPublisher(
+            publisher: publisher,
+            act: action,
+            timeout: timeout,
+            file: file,
+            line: line
+        ).getError()
+    }
+    
+    func awaitErrorPublisher<T: Publisher>(
+        _ publisher: T,
+        timeout: TimeInterval = 2,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) throws -> T.Failure {
+        try awaitPublisher(
+            publisher: publisher,
+            timeout: timeout,
+            file: file,
+            line: line
+        ).getError()
     }
 }
 
@@ -63,7 +111,7 @@ private extension XCTestCase {
         timeout: TimeInterval,
         file: StaticString,
         line: UInt
-    ) throws -> T.Output {
+    ) throws -> Result<T.Output, T.Failure> {
         var result: Result<T.Output, T.Failure>?
         let expectation = self.expectation(description: "Awaiting publisher")
 
@@ -104,6 +152,19 @@ private extension XCTestCase {
             line: line
         )
 
-        return try unwrappedResult.get()
+        return unwrappedResult
+    }
+}
+
+// MARK: - Result + Error
+private extension Result {
+    func getError() throws -> Failure {
+        switch self {
+        case .failure(let error):
+            return error
+            
+        case .success(_):
+            throw CNFatalError.custom("Result finished with success")
+        }
     }
 }

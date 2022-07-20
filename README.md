@@ -61,7 +61,7 @@ public protocol CNErrorHandler {
     
     func outputHandling(
         _ output: NetworingOutput,
-        _ retryMethod: @autoclosure () -> AnyPublisher<Data, ErrorType>
+        _ retryMethod: @autoclosure @escaping () -> AnyPublisher<Data, ErrorType>
     ) -> AnyPublisher<Data, ErrorType>
     
     func convert(error: NSError) -> ErrorType

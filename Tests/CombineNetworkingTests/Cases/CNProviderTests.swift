@@ -17,6 +17,7 @@ class CNProviderTests: XCTestCase {
     var builder: CNProviderBuilder!
     var decoder: JSONDecoderMock!
     var requestBuider: CNRequestBuilderFake!
+    var errorHandler: CNErrorHandlerMock!
     
     // MARK: - Life Cycle
     override func setUp() {
@@ -32,6 +33,7 @@ class CNProviderTests: XCTestCase {
         sut = nil
         decoder = nil
         requestBuider = nil
+        errorHandler = nil
         
         super.tearDown()
     }
@@ -98,16 +100,20 @@ extension CNProviderTests {
     
     func testCNProvider_whenReceivesErrorFromErrorHandler_resultFinishedWithThisError() throws {
         // Arrange
-        sut = builder.build()
+        errorHandler = TestDoublesFactory
+            .Mock
+            .getCNErrorHandler(returnAnErrorWhenHandling: .clientError)
         
+        sut = builder
+            .with(errorHandler: errorHandler)
+            .build()
+
         // Act
         let publisher = sut.generalPerform(requestBuider)
-        let _ = try awaitPublisher(publisher)
-        
+        let error = try awaitErrorPublisher(publisher)
+
         // Assert
-        let countOfOutputHandlingMethodCalled = builder.errorHandler.countOfOutputHandlingMethodsCalled
-        let isOutputHandlingMethodCalled = countOfOutputHandlingMethodCalled == 1
-        XCTAssertTrue(isOutputHandlingMethodCalled)
+        XCTAssertEqual(error, .clientError)
     }
     
     func testCNProvider_whenReceivesNSError_errorIsConvertedByErrorHandler() throws {

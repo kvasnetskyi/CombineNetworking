@@ -57,7 +57,8 @@ struct TestDoublesFactory {
             let headerFields: [String: String] = ["CNPluginTestModel": "Test"]
             
             return CNPluginFake(
-                url: url, body: body,
+                url: url,
+                body: body,
                 method: method,
                 headerFields: headerFields
             )

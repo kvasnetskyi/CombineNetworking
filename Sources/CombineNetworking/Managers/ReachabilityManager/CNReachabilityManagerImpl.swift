@@ -12,14 +12,14 @@ import Network
 ///
 /// It is manager to check the Internet connection. Used before attempting to send a request.
 /// It is a singleton, which you can get by property shared.
+///
+/// **For WatchOS, this manager always returns true.**
 public class CNReachabilityManagerImpl: CNReachabilityManager {
     // MARK: - Static Properties
     private static let queueLabel = "CNReachabilityManagerQueue"
     
     // MARK: - Public Properties
-    public var isInternetConnectionAvailable: Bool = {
-        return false
-    }()
+    public var isInternetConnectionAvailable = false
     
     // MARK: - Private Properties
     private var connectionMonitor = NWPathMonitor()
@@ -28,14 +28,20 @@ public class CNReachabilityManagerImpl: CNReachabilityManager {
     public static let shared = CNReachabilityManagerImpl()
     
     private init() {
-        let queue = DispatchQueue(
-            label: CNReachabilityManagerImpl.queueLabel
-        )
+        #if os(watchOS)
+            isInternetConnectionAvailable = true
         
-        self.connectionMonitor.pathUpdateHandler = { pathUpdateHandler in
-            self.isInternetConnectionAvailable = pathUpdateHandler.status == .satisfied
-        }
-        
-        self.connectionMonitor.start(queue: queue)
+        #else
+            let queue = DispatchQueue(
+                label: CNReachabilityManagerImpl.queueLabel
+            )
+            
+            self.connectionMonitor.pathUpdateHandler = { pathUpdateHandler in
+                self.isInternetConnectionAvailable = pathUpdateHandler.status == .satisfied
+            }
+            
+            self.connectionMonitor.start(queue: queue)
+            
+        #endif
     }
 }
